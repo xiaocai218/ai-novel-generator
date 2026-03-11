@@ -1,0 +1,14 @@
+version: "3"
+
+services:
+  ai-novel:
+    build: .
+    container_name: ai-novel
+    ports:
+      - "27000:8000"
+      - "27001:7860"
+    volumes:
+      - /share/CACHEDEV1_DATA/Container/ainovel/data:/app/data
+      - /share/CACHEDEV1_DATA/Container/ainovel/logs:/app/logs
+      - ./output:/app/output
+    restart: always
