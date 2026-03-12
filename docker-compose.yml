@@ -5,7 +5,6 @@ services:
     build: .
     container_name: ai-novel
     ports:
-      - "27000:8000"
       - "27001:7860"
     volumes:
       - /share/CACHEDEV1_DATA/Container/ainovel/data:/app/data
