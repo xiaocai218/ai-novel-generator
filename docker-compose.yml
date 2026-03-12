@@ -9,5 +9,9 @@ services:
     volumes:
       - /share/CACHEDEV1_DATA/Container/ainovel/data:/app/data
       - /share/CACHEDEV1_DATA/Container/ainovel/logs:/app/logs
-      - ./output:/app/output
+      - /share/CACHEDEV1_DATA/Container/ainovel/output:/app/output
+      - /share/CACHEDEV1_DATA/Container/ainovel/cache:/app/cache
+      - /share/CACHEDEV1_DATA/Container/ainovel/backups:/app/backups
+      - /share/CACHEDEV1_DATA/Container/ainovel/project_templates:/app/project_templates
+      - /share/CACHEDEV1_DATA/Container/ainovel/plugins:/app/plugins
     restart: always
