@@ -1,11 +1,23 @@
-version: "3"
+version: "3.9"
 
 services:
   ai-novel:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+
     container_name: ai-novel
+    restart: unless-stopped
+
     ports:
+      - "27000:8000"
       - "27001:7860"
+
+    environment:
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONUNBUFFERED: "1"
+      PYTHONPATH: "/app"
+
     volumes:
       - /share/CACHEDEV1_DATA/Container/ainovel/data:/app/data
       - /share/CACHEDEV1_DATA/Container/ainovel/logs:/app/logs
@@ -14,4 +26,16 @@ services:
       - /share/CACHEDEV1_DATA/Container/ainovel/backups:/app/backups
       - /share/CACHEDEV1_DATA/Container/ainovel/project_templates:/app/project_templates
       - /share/CACHEDEV1_DATA/Container/ainovel/plugins:/app/plugins
-    restart: always
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8000/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 15s
+      retries: 5
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
