@@ -14,6 +14,7 @@ from datetime import datetime
 import json
 
 from src.core.coherence.hierarchical_summary import HierarchicalSummaryManager
+from src.config.runtime_paths import get_config_file
 from src.core.style_optimizer import StyleOptimizer, detect_and_optimize, get_style_score
 from src.core.quality_assessor import QualityAssessor, assess_chapter_quality
 from src.core.unified_assessor import UnifiedAssessor, AITasteLevel, create_assessment_prompt
@@ -656,7 +657,8 @@ JSON格式示例：
         project_id: str,
         chapter_num: int,
         previous_chapters: List[Dict],
-        max_tokens: int
+        max_tokens: Optional[int] = None,
+        max_tokens_limit: Optional[int] = None
     ) -> Tuple[str, bool]:
         """
         智能构建上下文（使用分层摘要系统）
@@ -673,10 +675,23 @@ JSON格式示例：
             chapter_num: 当前章节号
             previous_chapters: 前面章节列表
             max_tokens: 可用的最大token数
+            max_tokens_limit: 兼容旧调用链的别名参数
 
         Returns:
             (context_text, should_generate_summary)
         """
+        # 兼容旧版本调用：部分运行环境仍传入 max_tokens_limit
+        if max_tokens is None and max_tokens_limit is not None:
+            max_tokens = max_tokens_limit
+            logger.warning(
+                "检测到旧参数名 max_tokens_limit，已兼容映射到 max_tokens。"
+                "建议同步部署最新版本以消除接口漂移。"
+            )
+
+        if max_tokens is None:
+            max_tokens = 4000
+            logger.warning("未提供 max_tokens，使用默认值 4000 构建上下文")
+
         # 确保动态调整系统已初始化
         self._ensure_dynamic_adjustment_initialized()
         
@@ -692,7 +707,7 @@ JSON格式示例：
             "prev_chapter_tail_chars": 800,
         }
 
-        config_file = Path("config/generation_config.json")
+        config_file = get_config_file("generation_config.json")
         if config_file.exists():
             with open(config_file, 'r', encoding='utf-8') as f:
                 config = json.load(f)
@@ -821,7 +836,7 @@ JSON格式示例：
         # 读取目标字数配置
         target_words = 3000  # 默认值
         try:
-            gen_config_file = Path("config/generation_config.json")
+            gen_config_file = get_config_file("generation_config.json")
             if gen_config_file.exists():
                 with open(gen_config_file, 'r', encoding='utf-8') as f:
                     gen_config = json.load(f)
@@ -1428,7 +1443,7 @@ JSON格式示例：
         # 从配置文件读取用户设置的上下文章节数
         config_max_chapters = 50  # 默认值
         try:
-            config_file = Path("config/generation_config.json")
+            config_file = get_config_file("generation_config.json")
             if config_file.exists():
                 with open(config_file, 'r', encoding='utf-8') as f:
                     config = json.load(f)

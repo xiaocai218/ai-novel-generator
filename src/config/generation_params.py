@@ -6,11 +6,12 @@
 """
 
 import json
-from pathlib import Path
 from typing import Dict, Any
 
+from .runtime_paths import get_config_file
+
 # 配置文件路径
-CONFIG_FILE = Path("config/generation_config.json")
+CONFIG_FILE = get_config_file("generation_config.json")
 
 
 def load_generation_config() -> Dict[str, Any]:

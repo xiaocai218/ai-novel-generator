@@ -28,6 +28,7 @@ from src.core.coherence import (
 )
 from src.core.prompts import PromptManager
 from src.config.providers import ProviderFactory, PRESET_PROVIDERS
+from src.config.runtime_paths import get_config_file, get_runtime_config_dir
 
 # 导入功能模块
 from .features import (
@@ -159,7 +160,7 @@ class AppState:
     def init_prompt_system(self):
         """初始化提示词系统"""
         logger.info("[应用] 初始化提示词系统")
-        config_dir = Path("config")
+        config_dir = get_runtime_config_dir()
         self.prompt_manager = PromptManager(config_dir)
         logger.info("[应用] 提示词系统已初始化")
 
@@ -176,7 +177,7 @@ class AppState:
         Returns:
             是否成功加载配置
         """
-        config_file = Path("config/user_config.json")
+        config_file = get_config_file("user_config.json", seed_from_project=False)
         if not config_file.exists():
             logger.info("[应用] 未找到API配置文件，跳过自动加载")
             return False
@@ -210,7 +211,7 @@ class AppState:
 
         # 从生成参数配置中读取max_tokens
         max_tokens = 20000  # 默认值
-        gen_config_file = Path("config/generation_config.json")
+        gen_config_file = get_config_file("generation_config.json")
         if gen_config_file.exists():
             try:
                 with open(gen_config_file, 'r', encoding='utf-8') as f:
@@ -906,7 +907,7 @@ def create_api_config_ui():
             config = ProviderFactory.get_provider_by_name(name)
             if config:
                 # 尝试从用户配置中读取该提供商的配置
-                config_file = Path("config/user_config.json")
+                config_file = get_config_file("user_config.json", seed_from_project=False)
                 timeout_val = 60  # 默认值
                 max_retries_val = 3  # 默认值
                 if config_file.exists():
@@ -978,7 +979,7 @@ def create_api_config_ui():
                 return error_msg, get_providers_list()
 
             # 保存到配置文件
-            config_dir = Path("config")
+            config_dir = get_runtime_config_dir()
             config_dir.mkdir(exist_ok=True)
             config_file = config_dir / "user_config.json"
 
@@ -1034,7 +1035,7 @@ def create_api_config_ui():
                 return "✗ 未找到提供商配置", get_providers_list()
 
             # 保存到配置文件
-            config_dir = Path("config")
+            config_dir = get_runtime_config_dir()
             config_dir.mkdir(exist_ok=True)
             config_file = config_dir / "user_config.json"
 
@@ -1075,7 +1076,7 @@ def create_api_config_ui():
 
         def on_clear_all_configs():
             """清空所有API配置"""
-            config_file = Path("config/user_config.json")
+            config_file = get_config_file("user_config.json", seed_from_project=False)
 
             if not config_file.exists():
                 return "ℹ️ 没有配置需要清空", get_providers_list()
@@ -1140,7 +1141,7 @@ def create_api_config_ui():
 
         def get_providers_list():
             """获取已配置提供商列表"""
-            config_file = Path("config/user_config.json")
+            config_file = get_config_file("user_config.json", seed_from_project=False)
             if not config_file.exists():
                 return "**尚未配置任何API接口**\n\n请选择提供商并配置"
 
@@ -1819,7 +1820,7 @@ def create_main_ui():
 def main():
     """启动应用"""
     # 迁移配置文件：删除旧的outline_max_tokens字段
-    config_file = Path("config/user_config.json")
+    config_file = get_config_file("user_config.json", seed_from_project=False)
     if config_file.exists():
         try:
             with open(config_file, 'r', encoding='utf-8') as f:

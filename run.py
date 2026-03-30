@@ -51,6 +51,14 @@ def main():
 
         atexit.register(on_exit)
 
+        # 初始化运行时配置目录，支持 Docker 持久化保存用户配置
+        from src.config.runtime_paths import ensure_runtime_config_files
+        ensure_runtime_config_files([
+            "generation_config.json",
+            "custom_prompts.json",
+            "novel_tool_config.json",
+        ])
+
         # 导入并启动应用
         from src.ui.app import main as run_app
         run_app()

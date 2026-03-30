@@ -19,6 +19,7 @@ import threading
 from openai import OpenAI, RateLimitError, APIError
 
 from ..config.providers import ProviderFactory, ProviderConfig, PRESET_PROVIDERS
+from ..config.runtime_paths import get_config_file
 from ..utils.api_logger import get_api_logger
 
 logger = logging.getLogger(__name__)
@@ -639,7 +640,7 @@ def get_api_client() -> Optional[UnifiedAPIClient]:
     """
     try:
         # 从配置文件加载
-        config_file = Path("config/user_config.json")
+        config_file = get_config_file("user_config.json", seed_from_project=False)
         if not config_file.exists():
             return None
 
