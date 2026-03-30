@@ -39,7 +39,7 @@ EXPOSE 8000
 
 # 健康检查
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8000/health || exit 1
+    CMD curl -f http://127.0.0.1:7860/ || exit 1
 
 # 设置启动命令
 CMD ["python", "run.py"]
