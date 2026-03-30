@@ -16,6 +16,7 @@ services:
       PYTHONUNBUFFERED: "1"
       PYTHONPATH: "/app"
       AINOVEL_CONFIG_DIR: "/app/data/config"
+      AINOVEL_DATA_DIR: "/app/data"
 
     volumes:
       - /share/CACHEDEV1_DATA/Container/ainovel/data:/app/data

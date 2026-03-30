@@ -28,7 +28,12 @@ from src.core.coherence import (
 )
 from src.core.prompts import PromptManager
 from src.config.providers import ProviderFactory, PRESET_PROVIDERS
-from src.config.runtime_paths import get_config_file, get_runtime_config_dir
+from src.config.runtime_paths import (
+    get_config_file,
+    get_runtime_config_dir,
+    get_projects_dir,
+    get_exports_dir,
+)
 
 # 导入功能模块
 from .features import (
@@ -145,7 +150,7 @@ class AppState:
         self.auto_generator: Optional[AutoNovelGenerator] = None
 
         # 项目管理器
-        self.project_dir = Path("projects")
+        self.project_dir = get_projects_dir()
         self.project_dir.mkdir(exist_ok=True)
 
     def init_coherence_systems(self, project_id: str):
@@ -471,7 +476,7 @@ def export_project(project_id: str, export_format: str = "json") -> Tuple[Option
     """
     try:
         # 创建导出目录
-        export_dir = Path("exports")
+        export_dir = get_exports_dir()
         export_dir.mkdir(exist_ok=True)
 
         # 加载项目数据

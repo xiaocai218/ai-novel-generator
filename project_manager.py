@@ -12,11 +12,11 @@ import logging
 from typing import List, Dict, Optional, Tuple
 from datetime import datetime
 from pathlib import Path
+from src.config.runtime_paths import get_projects_dir, get_exports_dir
 
 logger = logging.getLogger(__name__)
 
-PROJECTS_DIR = "projects"
-os.makedirs(PROJECTS_DIR, exist_ok=True)
+PROJECTS_DIR = get_projects_dir()
 
 
 class ProjectManager:
@@ -71,7 +71,7 @@ class ProjectManager:
 
         # 保存项目
         try:
-            project_file = Path(PROJECTS_DIR) / f"{project_id}.json"
+            project_file = PROJECTS_DIR / f"{project_id}.json"
             with open(project_file, 'w', encoding='utf-8') as f:
                 json.dump(project_data, f, ensure_ascii=False, indent=2)
 
@@ -102,7 +102,7 @@ class ProjectManager:
             project_data["updated_at"] = datetime.now().isoformat()
 
             # 保存到文件
-            project_file = Path(PROJECTS_DIR) / f"{project_id}.json"
+            project_file = PROJECTS_DIR / f"{project_id}.json"
             with open(project_file, 'w', encoding='utf-8') as f:
                 json.dump(project_data, f, ensure_ascii=False, indent=2)
 
@@ -124,7 +124,7 @@ class ProjectManager:
         """
         try:
             # 尝试新格式（单文件）
-            project_file = Path(PROJECTS_DIR) / f"{project_id}.json"
+            project_file = PROJECTS_DIR / f"{project_id}.json"
 
             if project_file.exists():
                 with open(project_file, 'r', encoding='utf-8') as f:
@@ -133,7 +133,7 @@ class ProjectManager:
                 return project_data
 
             # 尝试旧格式（目录）
-            project_dir = Path(PROJECTS_DIR) / project_id
+            project_dir = PROJECTS_DIR / project_id
             if project_dir.exists():
                 metadata_file = project_dir / "metadata.json"
                 if metadata_file.exists():
@@ -179,7 +179,7 @@ class ProjectManager:
         """
         try:
             projects = []
-            projects_path = Path(PROJECTS_DIR)
+            projects_path = PROJECTS_DIR
 
             if not projects_path.exists():
                 return projects
@@ -240,7 +240,7 @@ class ProjectManager:
             (成功标志, 状态信息)
         """
         try:
-            project_file = Path(PROJECTS_DIR) / f"{project_id}.json"
+            project_file = PROJECTS_DIR / f"{project_id}.json"
 
             if not project_file.exists():
                 return False, f"项目不存在: {project_id}"
@@ -271,8 +271,7 @@ class ProjectManager:
             if not project_data:
                 return None, f"项目不存在: {project_id}"
 
-            export_dir = Path(PROJECTS_DIR) / "exports"
-            export_dir.mkdir(exist_ok=True)
+            export_dir = get_exports_dir()
 
             if export_format == "json":
                 filename = f"{project_data.get('title', project_id)}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
